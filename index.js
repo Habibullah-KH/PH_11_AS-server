@@ -3,7 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const app = express();
 const port = process.env.PORT || 8000;
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
 app.use(cors());
 app.use(express.json());
@@ -23,8 +23,11 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
 
-
+//? tutorial server
     const dataBase = client.db('PH_11_AS_server').collection('tutorials');
+
+//? user data server
+    const userDB = client.db('PH_11_AS_server').collection('userData');
 
     //!get (all/ full/ bulk) data from surver [Demo or test purpose]
     app.get('/cards', async(req, res)=>{
@@ -53,7 +56,29 @@ async function run() {
         console.error('Error from find-tutors route:', err);
       }
     })
-
+    //*get tutors data
+    app.get('/tutor/:details', async(req, res)=>{
+      try{
+        const details = req.params.details;
+        const query = {_id: new ObjectId(details)}
+        const result = await dataBase.find(query).toArray();
+        res.send(result);
+      }
+      catch (error) {
+        console.error('Error fetching products:', error);
+      }
+    })
+    //*create user data/user book data
+    app.post('/bookData', async(req, res)=>{
+      try{
+        const userData = req.body;
+        const result = await userDB.insertOne(userData);
+        res.send(result);
+      }
+      catch (err) {
+        console.err('Error fetchig from userDB:', err)
+      }
+    })
 
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
