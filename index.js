@@ -68,17 +68,37 @@ async function run() {
         console.error('Error fetching products:', error);
       }
     })
-    //*create user data/user book data
+    //*create (user data)/(user book data)
     app.post('/bookData', async(req, res)=>{
       try{
         const userData = req.body;
+        const {tutorId} = userData;
+        const query = {tutorId};  
+
+        const dataValided = await userDB.findOne(query);
+        if (dataValided) {
+          return res.status(400).send({ message: 'You already booked this tutor.' });
+        }
         const result = await userDB.insertOne(userData);
-        res.send(result);
+        res.status(201).send({ message: 'Tutor booked successfully!', result });
       }
       catch (err) {
-        console.err('Error fetchig from userDB:', err)
+        console.error('Error fetchig from userDB:', err)
       }
     })
+    //* get data for My Booked Tutor route
+    app.get('/myBookedData/:email', async(req, res)=>{
+      try{
+        const email = req.params.email;
+        const query = {email: email};
+        const result = await userDB.find(query).toArray();
+        res.send(result)
+      }
+      catch (err){
+        console.error('Error fetching from userDB myyBookedData route:', err)
+      }
+    })
+
 
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
