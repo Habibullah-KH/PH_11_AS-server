@@ -27,7 +27,7 @@ async function run() {
     const dataBase = client.db('PH_11_AS_server').collection('tutorials');
 
 //? user data server
-    const userDB = client.db('PH_11_AS_server').collection('userData');
+    const userDB = client.db('PH_11_AS_server').collection('userBookedData');
 
     //!get (all/ full/ bulk) data from surver [Demo or test purpose]
     app.get('/cards', async(req, res)=>{
@@ -98,7 +98,34 @@ async function run() {
         console.error('Error fetching from userDB myyBookedData route:', err)
       }
     })
+    //* user review count
+    const { ObjectId } = require('mongodb');
 
+    app.post('/review', async (req, res) => {
+      try {
+        const { tutorId } = req.body;
+    
+        if (!tutorId) {
+          return res.status(400).send({ error: 'Tutor ID is required' });
+        }
+    
+        const filter = { _id: new ObjectId(tutorId) }; // Ensure valid ObjectId
+        const update = { $inc: { review: 1 } };
+    
+        const updateReviewCount = await dataBase.updateOne(filter, update);
+    
+        if (updateReviewCount.modifiedCount === 0) {
+          return res.status(404).send({ error: 'Tutor not found' });
+        }
+    
+        res.send({ success: true, message: 'Review count updated' });
+      } catch (err) {
+        console.error('Error updating review:', err);
+        res.status(500).send({ error: 'Internal Server Error' });
+      }
+    });
+    
+    
 
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
