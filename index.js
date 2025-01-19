@@ -56,6 +56,30 @@ async function run() {
         console.error('Error from find-tutors route:', err);
       }
     })
+    //*Add my tutorial on server
+    app.post('/addTutorial', async(req, res)=>{
+      try{
+        const data = req.body;
+        const result = await dataBase.insertOne(data);
+        res.send(result)
+      }
+      catch (error) {
+        console.error('Error from addTutorial route:', error);
+      }
+    })
+    //*get my tutorial on server
+    app.get('/mytutorial/:email', async(req, res)=>{
+      try{
+        const email = req.params.email;
+        const query = {email: email};
+        const result = await dataBase.find(query).toArray();
+        res.send(result)
+      }
+      catch (err){
+        console.error('Error fetching from userDB mytutorial route:', err)
+      }
+    })
+
     //*get tutors data
     app.get('/tutor/:details', async(req, res)=>{
       try{
@@ -124,7 +148,7 @@ async function run() {
         res.status(500).send({ error: 'Internal Server Error' });
       }
     });
-    
+
     
 
     // Connect the client to the server	(optional starting in v4.7)
