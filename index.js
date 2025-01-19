@@ -105,6 +105,21 @@ async function run() {
         console.error('Error fetching from dataBase UpdateMyTutorial route:', err)
       }
     })
+    //*** delete my tutorial
+    app.delete('/delete/:id', async(req, res)=>{
+      try{
+        const id = req.params.id;
+        const query = {_id: new ObjectId(id)};
+        const result = await dataBase.deleteOne(query);
+        if (!query) {
+          return res.status(400).send({ message: 'property missing' });
+        }
+        res.send(result);
+      }
+      catch (err) {
+        console.error('Error fetching products:', err);
+      }
+    })
 
     //*get tutors data
     app.get('/tutor/:details', async(req, res)=>{
