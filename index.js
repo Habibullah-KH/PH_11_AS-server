@@ -56,7 +56,7 @@ async function run() {
         console.error('Error from find-tutors route:', err);
       }
     })
-    //*Add my tutorial on server
+    //***Add my tutorial on server
     app.post('/addTutorial', async(req, res)=>{
       try{
         const data = req.body;
@@ -67,7 +67,7 @@ async function run() {
         console.error('Error from addTutorial route:', error);
       }
     })
-    //*get my tutorial on server
+    //***get my tutorial on server
     app.get('/mytutorial/:email', async(req, res)=>{
       try{
         const email = req.params.email;
@@ -77,6 +77,32 @@ async function run() {
       }
       catch (err){
         console.error('Error fetching from userDB mytutorial route:', err)
+      }
+    })
+    //***Update my tutorial
+    app.put('/UpdateMyTutorial/:id', async(req, res)=>{
+      try{
+        const id = req.params.id;
+        const filter = {_id: new ObjectId(id)}
+        const options = { upsert: true};
+        const updatedTutorial = req.body;
+        const updatedTutorials = {
+          $set: {
+            email: updatedTutorial.email,
+             name: updatedTutorial.name,
+             image: updatedTutorial.image,
+             description: updatedTutorial.description,
+             price: updatedTutorial.price,
+             language: updatedTutorial.language,
+             rating: updatedTutorial.rating
+
+          }
+        }
+        const result = await dataBase.updateOne(filter, updatedTutorials, options)
+        res.send(result);
+      }
+      catch (err){
+        console.error('Error fetching from dataBase UpdateMyTutorial route:', err)
       }
     })
 
