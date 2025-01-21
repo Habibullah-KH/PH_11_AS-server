@@ -1,12 +1,36 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const jwt = require('jsonwebtoken');
+const cookieParser = require('cookie-parser');
 const app = express();
-const port = process.env.PORT || 8000;
+const port = process.env.PORT || 8210;
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
-app.use(cors());
+app.use(cors({
+  origin: ['http://localhost:5173', 'https://ph-11-as-cef28.web.app', 'ph-11-as-cef28.firebaseapp.com'],
+  credentials: true
+
+}));
 app.use(express.json());
+app.use(cookieParser());
+
+const verifyToken = (req, res, next) =>{
+  const token = req.cookies?.token ;
+  if(!token){
+    return res.status(410).send({message: 'unauthorize access'});
+  }
+
+  //verify
+  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) =>{
+    if(err){
+      return res.status(401).send({message: 'unauthorized access'});
+    }
+    req.user = decoded;
+    next();
+  })
+  next();
+}
 
 const uri = `mongodb+srv://${process.env.DB_user}:${process.env.DB_password}@cluster0.utrln.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
@@ -29,13 +53,36 @@ async function run() {
 //? user data server
     const userDB = client.db('PH_11_AS_server').collection('userBookedData');
 
+    //?jwt token
+app.post('/jwt', (req, res)=>{
+  const user = req.body;
+  const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
+    expiresIn: '30d'
+  });
+  res.cookie('token', token, {
+    httpOnly: true,
+    secure: false,
+    
+  })
+  .send({success: true})
+})
+
+//?logout clear cookie
+app.post('/logout', (req, res)=>{
+  res.clearCookie('token', {
+    httpOnly: true,
+    secure: false
+  })
+  .send({success:  true})
+})
+
     //!get (all/ full/ bulk) data from surver [Demo or test purpose]
     app.get('/cards', async(req, res)=>{
       try{
         const cursor = dataBase.find();
         const result = await cursor.toArray();
         res.send(result);
-        console.log(result);
+        // console.log(result);
       }
       catch (error) {
         console.error('Error fetching language data:', error);
@@ -44,13 +91,13 @@ async function run() {
     })
 
     //* get data/find-tutors based on language
-    app.get('/find-tutors/:language?', async(req, res)=>{
+    app.get('/find-tutors/:language', async(req, res)=>{
       try{
         const language = req.params.language;
         const query = language ? { language: language } : {};
         const result = await dataBase.find(query).toArray();
         res.send(result);
-        console.log(result);
+        // console.log(result);
       } 
       catch (err){
         console.error('Error from find-tutors route:', err);
@@ -68,10 +115,17 @@ async function run() {
       }
     })
     //***get my tutorial on server
-    app.get('/mytutorial/:email', async(req, res)=>{
+    app.get('/mytutorial/:email', verifyToken, async(req, res)=>{
       try{
         const email = req.params.email;
         const query = {email: email};
+
+        // console.log(req.cookies?.token);
+        if(req.user.email !== req.query.email){
+          return res.status(403).send({message: 'forbidden'})
+        }
+        
+
         const result = await dataBase.find(query).toArray();
         res.send(result)
       }
@@ -195,8 +249,8 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
     // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
-    console.log("Pinged your deployment. You successfully connected to MongoDB!");
+    // await client.db("admin").command({ ping: 1 });
+    // console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
     // Ensures that the client will close when you finish/error
     // await client.close();
