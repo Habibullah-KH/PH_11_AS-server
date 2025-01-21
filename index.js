@@ -77,18 +77,26 @@ app.post('/logout', (req, res)=>{
 })
 
     //!get (all/ full/ bulk) data from surver [Demo or test purpose]
-    app.get('/cards', async(req, res)=>{
-      try{
-        const cursor = dataBase.find();
-        const result = await cursor.toArray();
-        res.send(result);
-        // console.log(result);
-      }
-      catch (error) {
+    app.get('/cards', async (req, res) => {
+      try {
+        const search = req.query.search
+
+          let query = {
+            language: {
+              $regex: search,
+              $options: 'i'
+            },
+          }
+          const result = await dataBase.find(query).toArray();
+          res.send(result);
+        }
+         catch (error) {
         console.error('Error fetching language data:', error);
         res.status(500).send({ error: 'Failed to fetch products' });
       }
-    })
+    });
+    
+    
 
     //* get data/find-tutors based on language
     app.get('/find-tutors/:language', async(req, res)=>{
