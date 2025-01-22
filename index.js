@@ -4,7 +4,7 @@ const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
 const app = express();
-const port = process.env.PORT || 8210;
+const port = process.env.PORT || 9220;
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
 app.use(cors({
@@ -29,7 +29,6 @@ const verifyToken = (req, res, next) =>{
     req.user = decoded;
     next();
   })
-  next();
 }
 
 const uri = `mongodb+srv://${process.env.DB_user}:${process.env.DB_password}@cluster0.utrln.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
@@ -43,6 +42,11 @@ const client = new MongoClient(uri, {
     deprecationErrors: true,
   }
 });
+// const client = new MongoClient(uri, {
+//   useNewUrlParser: true,
+//   useUnifiedTopology: true,
+//   serverApi: { version: '1', strict: false }
+// });
 
 async function run() {
   try {
@@ -129,9 +133,12 @@ app.post('/logout', (req, res)=>{
         const query = {email: email};
 
         // console.log(req.cookies?.token);
-        if(req.user.email !== req.query.email){
+        if(req.user.email !== req.params.email){
           return res.status(403).send({message: 'forbidden'})
         }
+        // console.log('user email:',req.user.email);
+        // console.log('params emeail:',req.params.email);
+        // console.log(req.user.email === req.params.email);
         
 
         const result = await dataBase.find(query).toArray();
@@ -225,6 +232,18 @@ app.post('/logout', (req, res)=>{
         console.error('Error fetching from userDB myyBookedData route:', err)
       }
     })
+      //!get all booked data
+      app.get('/allMyBookedData', async(req, res)=>{
+        try{
+          const data = userDB.find();
+          const result = await data.toArray() ;
+          res.send(result)
+        }
+        catch (error) {
+          console.error('Error fetching products:', error);
+          res.status(500).send({ error: 'Failed to fetch allMyBookedData' });
+        }
+      })
     //* user review count
     const { ObjectId } = require('mongodb');
 
@@ -252,6 +271,20 @@ app.post('/logout', (req, res)=>{
       }
     });
 
+    //!! count users
+
+    app.get('/countUsers', async (req, res) => {
+      try {
+        const cursor =  dataBase.find();
+        const result = await cursor.toArray();
+        res.send(result);
+
+      } catch (error) {
+        console.error('Error fetching products:', error);
+        res.status(500).send({ error: 'Failed to fetch products' });
+      }
+    });
+        
     
 
     // Connect the client to the server	(optional starting in v4.7)
