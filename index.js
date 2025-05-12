@@ -43,11 +43,7 @@ const client = new MongoClient(uri, {
     deprecationErrors: true,
   }
 });
-// const client = new MongoClient(uri, {
-//   useNewUrlParser: true,
-//   useUnifiedTopology: true,
-//   serverApi: { version: '1', strict: false }
-// });
+
 
 async function run() {
   try {
