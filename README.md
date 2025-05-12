@@ -1,6 +1,9 @@
 # 🚀 Project Setup Guide
 
+
 ## 🖥 server Setup (Node.js + Express.js + MongoDB)
+
+## Clone the project from github 'Code > HTTPS > Clone using the web URL.'
 
 ### 1. Go to the Server Directory
 
