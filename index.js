@@ -4,11 +4,11 @@ const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
 const app = express();
-const port = process.env.PORT || 9220;
+const port = process.env.PORT || 3000;
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
 app.use(cors({
-  origin: ['http://localhost:5173', 'https://ph-11-as-cef28.web.app', 'ph-11-as-cef28.firebaseapp.com'],
+  origin: ['http://localhost:5173', 'https://ph-11-as-cef28.web.app', 'https://ph-11-as-cef28.firebaseapp.com'],
   credentials: true
 
 }));
@@ -43,7 +43,11 @@ const client = new MongoClient(uri, {
     deprecationErrors: true,
   }
 });
-
+// const client = new MongoClient(uri, {
+//   useNewUrlParser: true,
+//   useUnifiedTopology: true,
+//   serverApi: { version: '1', strict: false }
+// });
 
 async function run() {
   try {
@@ -58,7 +62,7 @@ async function run() {
 app.post('/jwt', (req, res)=>{
   const user = req.body;
   const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
-    expiresIn: '30d'
+    expiresIn: '1d'
   });
   res.cookie('token', token, {
     httpOnly: true,
