@@ -1,20 +1,35 @@
-# 🚀 Project Setup Guide
+### 🔸 Project Overview:
+To provide an efficient and interactive solution for hiring tutors, enabling users to enhance their skills in a friendly and accessible environment.
 
+## 🛠 Server Installation
 
-## 🖥 server Setup (Node.js + Express.js + MongoDB)
+To set up the server, open your terminal and run the following commands:
 
-## Clone the project from github 'Code > HTTPS > Clone using the web URL.'
+```bash
+git clone https://github.com/Habibullah-KH/PH_11_AS-server.git
 
-### 1. Go to the Server Directory
+```bash
+cd PH_11_AS-server
+```
 
-* cd PH_11_AS-server
+```bash
+npm install
+```
 
-### 2. Install Dependencies
+```bash
+npm install express
+```
 
-* npm install
+```bash
+npm run start
+```
 
-### 3. Start the Server
+### 📦 Packages Used
 
-* npm run start
-
-* Server runs at: http://localhost:5000
+- cookie-parser@1.4.7
+- cors@2.8.5
+- dotenv@16.4.7
+- express@4.21.2
+- jsonwebtoken@9.0.2
+- mongodb@6.12.0
+- nodemon@3.1.10
