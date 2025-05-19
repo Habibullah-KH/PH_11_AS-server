@@ -7,6 +7,7 @@ To set up the server, open your terminal and run the following commands:
 
 ```bash
 git clone https://github.com/Habibullah-KH/PH_11_AS-server.git
+```
 
 ```bash
 cd PH_11_AS-server
